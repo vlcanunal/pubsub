@@ -1,0 +1,9 @@
+name: pubsub
+channels:
+  - defaults
+dependencies:
+  - python=3.8.3
+  - pip
+  - pip:
+    - kafka-python
+    - requests
