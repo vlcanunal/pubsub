@@ -17,19 +17,11 @@ import tarfile
 import tempfile
 import subprocess
 
-KAFKA_RELEASE = "2.6.0"
+KAFKA_RELEASE = "3.1.0"
 KAFKA_FOLDER = f"kafka_2.13-{KAFKA_RELEASE}"
-KAFKA_LINK = f"https://downloads.apache.org/kafka/{KAFKA_RELEASE}/{KAFKA_FOLDER}.tgz"
 
 CONNECTOR_RELEASE = "v0.10-alpha"
 PUBSUB_CONNECTOR_LINK = f"https://github.com/GoogleCloudPlatform/pubsub/releases/download/{CONNECTOR_RELEASE}/pubsub-kafka-connector.jar"
-
-
-def extract_kafka_to(tempdir):
-    response = requests.get(KAFKA_LINK)
-    with tarfile.open(fileobj=io.BytesIO(response.content), mode='r:gz') as archive:
-        archive.extractall(path=tempdir)
-
 
 def get_connector(tempdir):
     response = requests.get(PUBSUB_CONNECTOR_LINK)
@@ -38,10 +30,6 @@ def get_connector(tempdir):
 
 
 def download(tempdir):
-    print("Downloading kafka...")
-    kafka_path = os.path.join(tempdir, "kafka")
-    os.mkdir(kafka_path)
-    extract_kafka_to(kafka_path)
     print("Downloading connector...")
     connector_path = os.path.join(tempdir, "connector")
     os.mkdir(connector_path)
@@ -97,7 +85,7 @@ def main():
         """)
     args = parser.parse_args()
     with tempfile.TemporaryDirectory() as tempdir:
-        download(tempdir)
+        tempdir=os.environ['KAFKA_PATH']
         make_connect_config(tempdir, args.bootstrap_servers)
         run_connector(tempdir, args.connector_properties_file)
 
